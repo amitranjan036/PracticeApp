@@ -1,11 +1,16 @@
 package com.greedygame.samplelist;
 
+
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 public class MainActivity extends AppCompatActivity {
+
+    private FloatingActionButton plus;
 
     String[] Bollywood = new String[]{
             "Akshay",
@@ -31,8 +36,23 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
             ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, R.layout.actingschool, Bollywood);
-            ListView list = (ListView) findViewById(R.id.listview1);
+            final ListView list = (ListView) findViewById(R.id.listview1);
 
             list.setAdapter(adapter);
+
+        plus = (FloatingActionButton) findViewById(R.id.fab);
+        plus.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v)
+            {
+
+
+            }
+        });
+
+
+
     }
-}
+
+
+        }
