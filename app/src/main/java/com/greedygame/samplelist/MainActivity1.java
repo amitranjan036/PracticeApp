@@ -16,20 +16,21 @@ import java.util.List;
 
 public class MainActivity1 extends AppCompatActivity {
     ArrayList<String> innerArray = new ArrayList<String>();
+    ArrayList<String> outerArray = new ArrayList<String>();
     ArrayAdapter<String> adapter;
     ListView list2;
     List<ApplicationInfo> packages;
     ProgressDialog pd;
+    String appname;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main1);
 
-          final PackageManager pm = getPackageManager();
-          packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
-        pd =new ProgressDialog(MainActivity1.this);
+          pd =new ProgressDialog(MainActivity1.this);
           list2 = (ListView) findViewById(R.id.listview1);
-          adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, innerArray);
+          adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, outerArray);
+          list2.setAdapter(adapter);
           new Numberlist().execute(null,null,null);
       }
 
@@ -37,15 +38,19 @@ public class MainActivity1 extends AppCompatActivity {
       {
           @Override
           protected Void doInBackground(Void... params) {
+              final PackageManager pm = getPackageManager();
+              packages = pm.getInstalledApplications(PackageManager.GET_META_DATA);
               for (ApplicationInfo info : packages)
                 {
-                    innerArray.add(info.packageName);
+                    appname = pm.getApplicationLabel(info).toString();
+                    innerArray.add(appname);
                 }
             try {
                 Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
             return null;
         }
 
@@ -59,7 +64,7 @@ public class MainActivity1 extends AppCompatActivity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            list2.setAdapter(adapter);
+            outerArray.addAll(innerArray);
             adapter.notifyDataSetChanged();
             pd.dismiss();
         }
