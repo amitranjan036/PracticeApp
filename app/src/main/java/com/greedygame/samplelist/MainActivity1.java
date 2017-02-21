@@ -49,7 +49,9 @@ public class MainActivity1 extends AppCompatActivity {
               public void onItemClick(AdapterView<?> parent, View view, int position, long id)
               {
                   Intent launchIntent = pm.getLaunchIntentForPackage(packagenameArray.get(position));
-                  startActivity(launchIntent);
+
+                  try{startActivity(launchIntent);}
+                  catch (NullPointerException n) {n.printStackTrace();}
               }
           });
           new Numberlist().execute(null,null,null);
