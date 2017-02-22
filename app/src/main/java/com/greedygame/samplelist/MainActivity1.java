@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import java.util.ArrayList;
@@ -33,18 +35,22 @@ public class MainActivity1 extends AppCompatActivity {
     String appname;
     PackageManager pm;
     String s;
+    Drawable icon;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main1);
 
-          pm = getPackageManager();
-          pd =new ProgressDialog(MainActivity1.this);
-          list2 = (ListView) findViewById(R.id.listview1);
-         adapter = new CustomAdapter(this, android.R.layout.simple_list_item_1, originalappobjectArray);
-          list2.setAdapter(adapter);
-          list2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        pm = getPackageManager();
+        pd =new ProgressDialog(MainActivity1.this);
+        list2 = (ListView) findViewById(R.id.listview1);
+
+        adapter = new CustomAdapter(this, android.R.layout.simple_list_item_1, originalappobjectArray);
+        list2.setAdapter(adapter);
+
+        list2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
               @Override
               public void onItemClick(AdapterView<?> parent, View view, int position, long id)
               {
@@ -54,16 +60,16 @@ public class MainActivity1 extends AppCompatActivity {
                   catch (NullPointerException n) {n.printStackTrace();}
               }
           });
-          new Numberlist().execute(null,null,null);
+
+
+        new Numberlist().execute(null,null,null);
       }
 
 
     public class CustomAdapter extends ArrayAdapter<AppObject>
     {
-
-
-        public CustomAdapter(Context context, int resource, List<AppObject> nikhil) {
-            super(context, resource, nikhil);
+        public CustomAdapter(Context context, int resource, List<AppObject> amit) {
+            super(context, resource, amit);
         }
 
         @NonNull
@@ -85,6 +91,7 @@ public class MainActivity1 extends AppCompatActivity {
             {
                 TextView tt1 = (TextView) v.findViewById(R.id.text_app_name);
                 TextView tt2 = (TextView) v.findViewById(R.id.text_package_name);
+                ImageView iconview = (ImageView) v.findViewById(R.id.appicon);
 
                 if (tt1 != null) {
                     tt1.setText(appobj.getappName());
@@ -93,6 +100,13 @@ public class MainActivity1 extends AppCompatActivity {
                 if (tt2 != null) {
                     tt2.setText(appobj.getpacketName());
                 }
+
+                try {
+                    iconview.setImageDrawable(pm.getApplicationIcon(appobj.getpacketName()));
+                } catch (PackageManager.NameNotFoundException e) {
+                    e.printStackTrace();
+                }
+
             }
             return v;
         }
@@ -112,6 +126,7 @@ public class MainActivity1 extends AppCompatActivity {
                     appname = pm.getApplicationLabel(info).toString();
                     packagenameArray.add(info.packageName);
                     s = info.packageName;
+                    icon = pm.getApplicationIcon(info);
                     AppObject a = new AppObject();
                     a.setappName(appname);
                     a.setpacketName(s);
@@ -141,6 +156,7 @@ public class MainActivity1 extends AppCompatActivity {
         {
             super.onPostExecute(aVoid);
             originalappobjectArray.addAll(duplicateappobjectArray);
+
             adapter.notifyDataSetChanged();
             pd.dismiss();
         }
