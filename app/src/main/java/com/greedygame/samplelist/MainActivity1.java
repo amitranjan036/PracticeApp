@@ -9,11 +9,16 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -25,7 +30,7 @@ import java.util.List;
  */
 
 public class MainActivity1 extends AppCompatActivity {
-    ArrayList<AppObject> duplicateappobjectArray = new ArrayList<AppObject>();
+    ArrayList<AppObject> duplicateAppObjectArray = new ArrayList<AppObject>();
     ArrayList<AppObject> originalappobjectArray = new ArrayList<AppObject>();
     ArrayList<String> packagenameArray = new ArrayList<String>();
     CustomAdapter adapter;
@@ -36,6 +41,7 @@ public class MainActivity1 extends AppCompatActivity {
     PackageManager pm;
     String s;
     Drawable icon;
+    EditText searchBar;
 
 
     @Override
@@ -46,6 +52,7 @@ public class MainActivity1 extends AppCompatActivity {
         pm = getPackageManager();
         pd =new ProgressDialog(MainActivity1.this);
         list2 = (ListView) findViewById(R.id.listview1);
+        searchBar = (EditText) findViewById(R.id.searchBar);
 
         adapter = new CustomAdapter(this, android.R.layout.simple_list_item_1, originalappobjectArray);
         list2.setAdapter(adapter);
@@ -61,34 +68,69 @@ public class MainActivity1 extends AppCompatActivity {
               }
           });
 
+        searchBar.addTextChangedListener(new TextWatcher() {
 
-        new Numberlist().execute(null,null,null);
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                System.out.println("Text ["+s+"]");
+                adapter.getFilter().filter(s.toString());
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count,
+                                          int after) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+
+
+        new NumberList().execute(null,null,null);
       }
 
 
-    public class CustomAdapter extends ArrayAdapter<AppObject>
-    {
+    public class CustomAdapter extends ArrayAdapter<AppObject> implements Filterable {
+            private List<AppObject>originalData = null;
+            private List<AppObject>filteredData = null;
+
+
+
+
         public CustomAdapter(Context context, int resource, List<AppObject> amit) {
             super(context, resource, amit);
+            this.filteredData = amit;
+            this.originalData = amit;
         }
 
+        public int getCount() {
+            return filteredData.size();
+        }
+
+        public AppObject getItem(int position) {
+            return filteredData.get(position);
+        }
+
+        public long getItemId(int position) {
+            return position;
+        }
         @NonNull
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             View v = convertView;
 
-            if (v==null)
-            {
+            if (v == null) {
                 LayoutInflater vi;
                 vi = LayoutInflater.from(getContext());
                 v = vi.inflate(R.layout.customlayout, null);
 
             }
 
-             AppObject appobj = getItem(position);
+            AppObject appobj = getItem(position);
 
-            if (appobj != null)
-            {
+            if (appobj != null) {
                 TextView tt1 = (TextView) v.findViewById(R.id.text_app_name);
                 TextView tt2 = (TextView) v.findViewById(R.id.text_package_name);
                 ImageView iconview = (ImageView) v.findViewById(R.id.appicon);
@@ -110,12 +152,48 @@ public class MainActivity1 extends AppCompatActivity {
             }
             return v;
         }
+
+        @NonNull
+        @Override
+        public Filter getFilter() {
+
+
+            Filter filter = new Filter() {
+                @Override
+                protected FilterResults performFiltering(CharSequence constraint) {
+
+                    FilterResults results = new FilterResults();
+                    ArrayList<AppObject> filteredAppObjects = new ArrayList<AppObject>();
+                    final List<AppObject> list = originalData;
+                    String filterString = constraint.toString().toLowerCase();
+                    int count = list.size();
+
+                    for(int i = 0; i< count; i++){
+                        String appNameToCheck = list.get(i).getappName();
+                        if(appNameToCheck.toLowerCase().contains(filterString))
+                        {
+                         filteredAppObjects.add(list.get(i));
+                        }
+                    }
+
+                    results.count = filteredAppObjects.size();
+                    results.values = filteredAppObjects;
+
+                    return results;
+                }
+
+                @Override
+                protected void publishResults(CharSequence constraint, FilterResults results) {
+                    filteredData = (ArrayList<AppObject>) results.values;
+                    notifyDataSetChanged();
+                }
+            };
+            return filter;
+        }
     }
 
 
-
-
-    public class Numberlist extends AsyncTask<Void,Void,Void>
+    public class NumberList extends AsyncTask<Void,Void,Void>
       {
           @Override
           protected Void doInBackground(Void... params) {
@@ -130,7 +208,7 @@ public class MainActivity1 extends AppCompatActivity {
                     AppObject a = new AppObject();
                     a.setappName(appname);
                     a.setpacketName(s);
-                    duplicateappobjectArray.add(a);
+                    duplicateAppObjectArray.add(a);
                 }
             try {
                 Thread.sleep(2000);
@@ -155,7 +233,7 @@ public class MainActivity1 extends AppCompatActivity {
         protected void onPostExecute(Void aVoid)
         {
             super.onPostExecute(aVoid);
-            originalappobjectArray.addAll(duplicateappobjectArray);
+            originalappobjectArray.addAll(duplicateAppObjectArray);
 
             adapter.notifyDataSetChanged();
             pd.dismiss();
