@@ -1,4 +1,5 @@
 package com.greedygame.samplelist;
+import android.app.ActionBar;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -12,15 +13,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.Switch;
 import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,6 +58,17 @@ public class MainActivity1 extends AppCompatActivity {
         pd =new ProgressDialog(MainActivity1.this);
         list2 = (ListView) findViewById(R.id.listview1);
         searchBar = (EditText) findViewById(R.id.searchBar);
+
+        //Nikhil Code to remove
+        android.support.v7.app.ActionBar mActionBar = getSupportActionBar();
+
+        LayoutInflater mInflater = LayoutInflater.from(this);
+
+        View mCustomView = mInflater.inflate(R.layout.switch_layout, null);
+
+        mActionBar.setCustomView(mCustomView);
+        mActionBar.setDisplayShowCustomEnabled(true);
+        //
 
         adapter = new CustomAdapter(this, android.R.layout.simple_list_item_1, originalappobjectArray);
         list2.setAdapter(adapter);
@@ -170,10 +186,14 @@ public class MainActivity1 extends AppCompatActivity {
 
                     for(int i = 0; i< count; i++){
                         String appNameToCheck = list.get(i).getappName();
+                        String packetNameToCheck = list.get(i).getpacketName();
                         if(appNameToCheck.toLowerCase().contains(filterString))
                         {
-                         filteredAppObjects.add(list.get(i));
+                            filteredAppObjects.add(list.get(i));
+                        } else if (packetNameToCheck.toLowerCase().contains(filterString)) {
+                            filteredAppObjects.add(list.get(i));
                         }
+
                     }
 
                     results.count = filteredAppObjects.size();
@@ -239,4 +259,5 @@ public class MainActivity1 extends AppCompatActivity {
             pd.dismiss();
         }
     }
+
 }

@@ -36,6 +36,7 @@ public class AppObject
         {
             this.packetName = packetName;
         }
+
         public void setd_Icon(Drawable d_Icon)
         {
             this.d_Icon = d_Icon;
