@@ -1,5 +1,4 @@
 package com.greedygame.samplelist;
-import android.app.ActionBar;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -13,19 +12,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.Switch;
 import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.List;
@@ -53,36 +48,28 @@ public class MainActivity1 extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main1);
-
         pm = getPackageManager();
         pd =new ProgressDialog(MainActivity1.this);
         list2 = (ListView) findViewById(R.id.listview1);
         searchBar = (EditText) findViewById(R.id.searchBar);
-
-        //Nikhil Code to remove
-        android.support.v7.app.ActionBar mActionBar = getSupportActionBar();
-
-        LayoutInflater mInflater = LayoutInflater.from(this);
-
-        View mCustomView = mInflater.inflate(R.layout.switch_layout, null);
-
-        mActionBar.setCustomView(mCustomView);
-        mActionBar.setDisplayShowCustomEnabled(true);
-        //
-
         adapter = new CustomAdapter(this, android.R.layout.simple_list_item_1, originalappobjectArray);
         list2.setAdapter(adapter);
 
+        //Clicking on any app to goto next activity
         list2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
               @Override
               public void onItemClick(AdapterView<?> parent, View view, int position, long id)
               {
-                  Intent launchIntent = pm.getLaunchIntentForPackage(packagenameArray.get(position));
-
-                  try{startActivity(launchIntent);}
-                  catch (NullPointerException n) {n.printStackTrace();}
+                  Bundle b = new Bundle();
+                  AppObject a = (AppObject) parent.getAdapter().getItem(position);
+                  b.putString("myApp",a.getpacketName());
+                  Intent in = new Intent(getApplicationContext(), MainActivity2.class);
+                  in.putExtras(b);
+                  startActivity(in);
               }
           });
+
+        //Adding searchbar to search any app in list
 
         searchBar.addTextChangedListener(new TextWatcher() {
 
@@ -103,16 +90,18 @@ public class MainActivity1 extends AppCompatActivity {
             }
         });
 
+        //Using Async task by NumberList class
 
         new NumberList().execute(null,null,null);
+
+
       }
 
+        //Making CustomAdapter to show appname & package name & app icon
 
-    public class CustomAdapter extends ArrayAdapter<AppObject> implements Filterable {
+        public class CustomAdapter extends ArrayAdapter<AppObject> implements Filterable {
             private List<AppObject>originalData = null;
             private List<AppObject>filteredData = null;
-
-
 
 
         public CustomAdapter(Context context, int resource, List<AppObject> amit) {
@@ -184,7 +173,8 @@ public class MainActivity1 extends AppCompatActivity {
                     String filterString = constraint.toString().toLowerCase();
                     int count = list.size();
 
-                    for(int i = 0; i< count; i++){
+                    for(int i = 0; i< count; i++)
+                    {
                         String appNameToCheck = list.get(i).getappName();
                         String packetNameToCheck = list.get(i).getpacketName();
                         if(appNameToCheck.toLowerCase().contains(filterString))
