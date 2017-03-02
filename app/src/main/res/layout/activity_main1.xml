@@ -13,7 +13,8 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="2dp"
         android:padding="5dp"
-        android:completionThreshold="1"/>
+        android:completionThreshold="1"
+        android:hint="Search Here"/>
 
     <ListView
         android:layout_width="match_parent"
